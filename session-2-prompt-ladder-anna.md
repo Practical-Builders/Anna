@@ -20,6 +20,15 @@
 ###  - Provide the description in a format accessible to screen readers
 ###  - Display Claude's color analysis in the results area
 ### Data + validation
-### 
+### Add error handling and validation:
+### - Validate that the URL field is not empty before submitting
+### - Validate that the input is a proper URL format
+### - If the URL cannot be accessed, show error: "We couldn't access that page. Please check the URL and try again."
+### - If no product images are found on the page, show: "We couldn't find product images on this page. Please try a different URL."
+### - If the image cannot be analyzed (too dark, too blurry, etc.), show: "We had trouble analyzing this image."
+### - If the Claude API call fails, show: "Something went wrong. Please try again in a moment."
+### - Add a loading state that shows "Analyzing product image..." while waiting for the response
+### - Handle cases where pages have multiple product images, default to the main/first product image
 ### UX polish
+
 ### Docs + cleanup
