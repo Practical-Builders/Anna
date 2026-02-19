@@ -12,6 +12,6 @@
 ### 5. Desired outcome: Emma wants to know it is a "light purple with pink undertones" so she can make an informed purchase decision. 
 ### My solution should intervene at steps 3-4, giving her the actual color description she needs to shop confidently.
 ### What’s explicitly out of scope
-### 
+### Solving for product sizing/fit issues, addressing all accessibility issues on e-commerce websites, translating colors into other languages, and building a solution for brick and mortar stores. 
 
 
