@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accessible Colors</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Accessible Colors</h1>
+      <p class="tagline">Accessible color descriptions for online shopping</p>
+    </header>
+
+    <main>
+      <label for="product-url">Product URL</label>
+      <input
+        type="url"
+        id="product-url"
+        placeholder="https://example.com/product"
+        aria-describedby="url-hint"
+        disabled
+      />
+      <p id="url-hint" class="hint">URL analysis coming soon — use image upload below for now.</p>
+
+      <div class="divider" aria-hidden="true">or</div>
+
+      <label for="product-image">Upload a product image directly</label>
+      <input
+        type="file"
+        id="product-image"
+        accept=".jpg,.jpeg,.png,.webp"
+        aria-describedby="upload-hint"
+      />
+      <p id="upload-hint" class="hint">Accepts .jpg, .jpeg, .png, .webp</p>
+
+      <button id="analyze-btn" type="button">Analyze Colors</button>
+
+      <div id="results" aria-live="polite" aria-atomic="true"></div>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Accessible Colors</p>
+    </footer>
+
+    <script type="module" src="scripts/app.js"></script>
+  </body>
+</html>
