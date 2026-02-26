@@ -1,0 +1,17 @@
+
+# Environment variables (API keys)
+.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Node modules (for later)
+node_modules/
