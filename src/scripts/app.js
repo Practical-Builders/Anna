@@ -1,23 +1,36 @@
-import { analyzeImageFromBase64 } from "./claudeAPI.js";
+import { analyzeProductUrl, analyzeImageFromBase64 } from "./claudeAPI.js";
 
 const analyzeBtn = document.getElementById("analyze-btn");
+const urlInput = document.getElementById("product-url");
 const fileInput = document.getElementById("product-image");
 const results = document.getElementById("results");
 
 analyzeBtn.addEventListener("click", async () => {
+  const url = urlInput.value.trim();
   const file = fileInput.files[0];
 
-  if (!file) {
-    showError("Please upload a product image.");
+  if (!url && !file) {
+    showError("Please enter a product URL or upload an image.");
     return;
   }
 
   setLoading(true);
 
   try {
-    const { base64Data, mediaType, previewUrl } = await readImageFile(file);
-    const { colorDescriptions } = await analyzeImageFromBase64(base64Data, mediaType);
-    showResults(colorDescriptions, previewUrl);
+    if (url) {
+      // URL flow: Playwright backend screenshots the page → Claude analyzes
+      const { colorDescriptions, previewUrl } = await analyzeProductUrl(url);
+      console.log("[app] Received colors:", colorDescriptions);
+      console.log("[app] Displaying in UI:", colorDescriptions);
+      showResults(colorDescriptions, previewUrl);
+    } else {
+      // File upload flow: read locally → Claude analyzes
+      const { base64Data, mediaType, previewUrl } = await readImageFile(file);
+      const { colorDescriptions } = await analyzeImageFromBase64(base64Data, mediaType);
+      console.log("[app] Received colors:", colorDescriptions);
+      console.log("[app] Displaying in UI:", colorDescriptions);
+      showResults(colorDescriptions, previewUrl);
+    }
   } catch (err) {
     showError(err.message);
   } finally {

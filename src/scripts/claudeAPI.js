@@ -1,199 +1,82 @@
-const SYSTEM_PROMPT = `You are a color description specialist focused on accessibility for visually impaired shoppers.
+const SYSTEM_PROMPT = `You are a color description assistant for visually impaired and colorblind online shoppers. Your job is to describe product colors clearly and accurately.
 
-When shown a product image, identify and describe each distinct color you see.
+FORMATTING RULES — follow these exactly:
+- Plain text only. No markdown: no **, no __, no ##, no backticks.
+- Every line starts with a label and a colon: Label: description
+- If you can identify the product type with confidence, use it as the label (Lipstick, Eyeshadow, Dress, etc.)
+- If the product could reasonably be more than one type (e.g. blush or lip gloss, eyeshadow or liner), use the label: Makeup product
+- If the product type is completely unclear, use the label: Product
+- No introductory sentences, no sign-off, no commentary outside the descriptions.
 
-For each color use this format:
-- Start with a base color name. Use only these words: red, blue, green, yellow, orange, purple, pink, brown, black, white, gray, beige
-- Add depth descriptors where relevant: light, dark, deep, bright, pale, muted, soft
-- Add tone when it helps: warm, cool, neutral
-- Include finish if visible: matte, glossy, shimmery, metallic
-- Add a familiar comparison when it helps clarity: "like red wine", "like a peach", "like the sky"
+COLOR DESCRIPTION FORMAT:
+Always use: [Base color] + [Depth] + [Tone] + [Finish] + [Helpful comparison]
 
-NEVER use marketing or fancy color names such as: Merlot, Bordeaux Nights, Sage, Champagne, Ivory, Nude, Blush, Taupe, Ecru, Oatmeal, Mushroom, Slate, Cobblestone, etc.
+Base colors: red, blue, green, yellow, orange, purple, pink, brown, black, white, gray, beige, tan, coral, burgundy, navy, etc.
+Depth: pale, light, soft, medium, deep, dark, bright, muted, rich, vivid
+Tone: warm, cool, neutral
+Finish: matte, glossy, shimmery, glittery, metallic, satin, natural, pearlescent
+Comparisons: concrete and familiar — like a pink peony, like dark espresso, like morning mist
 
-Good examples:
-- "Deep burgundy red with cool undertones and matte finish, like red wine"
-- "Soft coral pink with warm tones, like a peach"
-- "Bright cobalt blue with a glossy finish"
-- "Light warm beige, like natural sand"
+OUTPUT BY PRODUCT TYPE:
 
-Return only the list of color descriptions, one per line, each starting with a dash (-). List the name of object being explained like "Dress: ". No other commentary or explanation. Do not list the color of the background.`;
+SINGLE-SHADE PRODUCTS (lipstick, blush, nail polish, single eyeshadow):
+One line. Example:
+Blush: Soft warm pink with neutral undertones and matte finish, like a fresh pink peony
 
-// =============================================================================
-// URL FETCHING — disabled while building backend proxy
-// Major e-commerce sites (Sephora, Amazon, etc.) block public CORS proxies
-// with bot protection (Akamai/Cloudflare). Will re-enable once a server-side
-// proxy is in place that can handle authenticated or proxied requests.
-// =============================================================================
+MULTI-SHADE PRODUCTS (eyeshadow palettes, lip sets, multi-color items):
+One line per shade. Include the shade name in the label if visible. Examples:
+Eyeshadow Glassy: Pale cool-toned gray with shimmery finish, like morning mist
+Eyeshadow Stolen: Warm medium pink-brown with metallic finish, like rose-tinted copper
 
-/*
-function isAccessDenied(html) {
-  const lower = html.toLowerCase().slice(0, 2000);
-  return (
-    lower.includes("<title>access denied</title>") ||
-    lower.includes("<h1>access denied</h1>") ||
-    lower.includes("you don't have permission") ||
-    lower.includes("403 forbidden") ||
-    lower.includes("robot check") ||
-    lower.includes("automated access") ||
-    lower.includes("captcha")
-  );
-}
+CLOTHING & ACCESSORIES:
+One or two lines covering color and pattern. Example:
+Dress: Navy blue with thin white horizontal stripes
 
-async function fetchProductPage(url) {
-  const proxies = [
-    {
-      name: "allorigins",
-      fetch: async () => {
-        const res = await fetch(
-          `https://api.allorigins.win/get?disableCache=true&url=${encodeURIComponent(url)}`
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        return data.contents;
-      },
-    },
-    {
-      name: "corsproxy.io",
-      fetch: async () => {
-        const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.text();
-      },
-    },
-  ];
+CRITICAL RULES:
+- NEVER use marketing color names (Merlot, Bordeaux Nights, Sunset Dreams)
+- Describe the product itself, not the packaging (tube, bottle, cap, brush)
+- Be specific enough that someone who cannot see the color can make an informed purchase decision`;
 
-  for (const proxy of proxies) {
-    try {
-      const html = await proxy.fetch();
-      if (!html) continue;
-      if (isAccessDenied(html)) continue;
-      return html;
-    } catch {
-      // try next proxy
-    }
+/**
+ * Sends a product URL to the Playwright backend, receives a screenshot,
+ * and returns Claude's color descriptions alongside a preview URL.
+ *
+ * @param {string} productUrl
+ * @returns {Promise<{ colorDescriptions: string[], previewUrl: string }>}
+ */
+async function analyzeProductUrl(productUrl) {
+  console.log("[claudeAPI] Requesting screenshot from Playwright backend...", { productUrl });
+
+  const screenshotRes = await fetch("http://localhost:3001/screenshot", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ url: productUrl }),
+  });
+
+  if (!screenshotRes.ok) {
+    const error = await screenshotRes.json().catch(() => ({}));
+    throw new Error(error.error || `Screenshot service error ${screenshotRes.status}`);
   }
 
-  throw new Error(
-    "This site is blocking automated access. Try a different product URL — sites like ASOS, H&M, or Zara tend to work."
-  );
+  const { screenshot } = await screenshotRes.json();
+  console.log(`[claudeAPI] Screenshot received (${Math.round(screenshot.length * 0.75 / 1024)} KB)`);
+
+  console.log("[claudeAPI] Sending screenshot to Claude for color analysis...");
+  const { colorDescriptions } = await analyzeImageFromBase64(screenshot, "image/png");
+  console.log("[claudeAPI] Color analysis complete.");
+
+  return {
+    colorDescriptions,
+    previewUrl: `data:image/png;base64,${screenshot}`,
+  };
 }
-
-function getRawSrc(img) {
-  return (
-    img.getAttribute("data-src") ||
-    img.getAttribute("data-lazy-src") ||
-    img.getAttribute("data-lazy") ||
-    img.getAttribute("data-original") ||
-    img.getAttribute("data-image-src") ||
-    img.getAttribute("data-zoom-image") ||
-    img.getAttribute("srcset")?.split(",")[0]?.trim()?.split(" ")[0] ||
-    img.getAttribute("src") ||
-    null
-  );
-}
-
-function resolveImageUrl(imageUrl, pageUrl) {
-  if (!imageUrl) return null;
-  try {
-    return new URL(imageUrl, pageUrl).href;
-  } catch {
-    return imageUrl;
-  }
-}
-
-function looksLikeProductImage(url) {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  const isImage = /\.(jpe?g|png|webp|avif)(\?|$)/.test(lower) || lower.includes("/image") || lower.includes("/photo") || lower.includes("/product");
-  const isJunk = lower.includes("logo") || lower.includes("icon") || lower.includes("sprite") || lower.includes("pixel") || lower.includes("tracking") || lower.includes("1x1");
-  return isImage && !isJunk;
-}
-
-function extractProductImage(html, pageUrl) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-
-  const ogImage = doc.querySelector('meta[property="og:image"]');
-  const ogContent = ogImage?.getAttribute("content");
-  if (ogContent) return resolveImageUrl(ogContent, pageUrl);
-
-  const twitterImage = doc.querySelector('meta[name="twitter:image"], meta[name="twitter:image:src"]');
-  const twitterContent = twitterImage?.getAttribute("content");
-  if (twitterContent) return resolveImageUrl(twitterContent, pageUrl);
-
-  const jsonLdScripts = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
-  for (const script of jsonLdScripts) {
-    try {
-      const data = JSON.parse(script.textContent);
-      const entries = Array.isArray(data) ? data : [data];
-      for (const entry of entries) {
-        const imgUrl = entry.image?.[0] ?? entry.image;
-        if (typeof imgUrl === "string" && imgUrl.startsWith("http")) return imgUrl;
-      }
-    } catch {
-      // malformed JSON-LD — skip
-    }
-  }
-
-  const schemaImage = doc.querySelector('[itemprop="image"]');
-  const schemaSrc = schemaImage?.getAttribute("content") || getRawSrc(schemaImage);
-  if (schemaSrc) return resolveImageUrl(schemaSrc, pageUrl);
-
-  const productSelectors = [
-    '[data-testid="product-image"] img',
-    '[data-testid="hero-image"] img',
-    "#product-image",
-    "img#product-image",
-    ".product-image img",
-    ".product__image",
-    "img.product__image",
-    ".product-image",
-    "img.product-image",
-    "#product-image img",
-    ".gallery__image img",
-    ".product-gallery img",
-    ".pdp-image img",
-    '[data-zoom-image]',
-  ];
-  for (const selector of productSelectors) {
-    const el = doc.querySelector(selector);
-    const rawSrc = el ? getRawSrc(el) : null;
-    if (rawSrc) return resolveImageUrl(rawSrc, pageUrl);
-  }
-
-  const candidates = Array.from(doc.querySelectorAll("img"))
-    .map((img) => ({
-      resolved: resolveImageUrl(getRawSrc(img), pageUrl),
-      htmlWidth: img.getAttribute("width"),
-      htmlHeight: img.getAttribute("height"),
-    }))
-    .filter(({ resolved }) => resolved && looksLikeProductImage(resolved));
-
-  if (candidates.length === 0) throw new Error("Could not find a product image on this page.");
-
-  const withDimensions = candidates.filter((c) => c.htmlWidth && c.htmlHeight);
-  const pool = withDimensions.length > 0 ? withDimensions : candidates;
-  pool.sort((a, b) => Number(b.htmlWidth || 0) - Number(a.htmlWidth || 0));
-  return pool[0].resolved;
-}
-
-async function analyzeProductColors(productPageUrl) {
-  const html = await fetchProductPage(productPageUrl);
-  const imageUrl = extractProductImage(html, productPageUrl);
-  return analyzeImageFromBase64(...(await urlImageToBase64(imageUrl)), imageUrl);
-}
-*/
-
-// =============================================================================
-// ACTIVE: Direct image upload — bypasses CORS entirely
-// =============================================================================
 
 /**
  * Sends a base64-encoded image to Claude's vision API and returns color descriptions.
+ * Used by both the URL flow (Playwright screenshot) and the direct file upload flow.
  *
  * @param {string} base64Data - Raw base64 image data (no data URI prefix)
- * @param {string} mediaType  - MIME type, e.g. "image/jpeg"
+ * @param {string} mediaType  - MIME type, e.g. "image/jpeg" or "image/png"
  * @returns {Promise<{ colorDescriptions: string[] }>}
  */
 async function analyzeImageFromBase64(base64Data, mediaType) {
@@ -202,9 +85,7 @@ async function analyzeImageFromBase64(base64Data, mediaType) {
   // so neither is needed here and the API key never reaches the browser bundle.
   const response = await fetch("/api/anthropic", {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
+    headers: { "content-type": "application/json" },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
@@ -237,15 +118,25 @@ async function analyzeImageFromBase64(base64Data, mediaType) {
   }
 
   const data = await response.json();
+  console.log("[claudeAPI] Full Claude response:", data);
+  console.log("[claudeAPI] Response content:", data.content);
+  console.log("[claudeAPI] Claude text:", data.content[0]?.text);
+
   const rawText = data.content[0].text;
 
   const colorDescriptions = rawText
     .split("\n")
     .map((line) => line.trim())
-    .filter((line) => line.startsWith("-"))
-    .map((line) => line.slice(1).trim());
+    .filter((line) => line.length > 0)
+    .map((line) => {
+      // Strip leading bullet characters produced by either prompt format
+      if (line.startsWith("* ")) return line.slice(2);
+      if (line.startsWith("- ")) return line.slice(2);
+      if (line.startsWith("*") || line.startsWith("-")) return line.slice(1).trim();
+      return line;
+    });
 
   return { colorDescriptions };
 }
 
-export { analyzeImageFromBase64 };
+export { analyzeProductUrl, analyzeImageFromBase64 };
