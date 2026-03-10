@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Accessible Colors",
+  "version": "1.0.0",
+  "description": "Describes product colors for visually impaired and colorblind shoppers.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["<all_urls>", "http://localhost:3001/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Describe Colors",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html", "sidebar.css", "sidebar.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

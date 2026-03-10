@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accessible Colors</title>
+    <link rel="stylesheet" href="sidebar.css" />
+  </head>
+  <body>
+    <div class="sidebar">
+      <header class="sidebar-header">
+        <h1>Accessible Colors</h1>
+        <button id="close-btn" aria-label="Close sidebar" title="Close">✕</button>
+      </header>
+
+      <main class="sidebar-body" id="sidebar-body">
+        <p class="hint">Click <strong>Analyze</strong> to describe the colors on this product page.</p>
+        <button id="analyze-btn" class="analyze-btn">Analyze Colors</button>
+        <div id="results" aria-live="polite" aria-atomic="true"></div>
+      </main>
+    </div>
+
+    <script src="sidebar.js"></script>
+  </body>
+</html>
