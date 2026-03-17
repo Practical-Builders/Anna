@@ -39,8 +39,8 @@ analyzeBtn.addEventListener("click", async () => {
       throw new Error(body.error || `Server error ${res.status}`);
     }
 
-    const { colorDescriptions, screenshot } = await res.json();
-    showResults(colorDescriptions, `data:image/png;base64,${screenshot}`);
+    const { colorDescriptions } = await res.json();
+    showResults(colorDescriptions);
   } catch (err) {
     console.error("[accessible-colors] Fetch error:", err);
     if (
@@ -70,14 +70,8 @@ function setLoading(isLoading) {
   }
 }
 
-function showResults(colorDescriptions, previewUrl) {
+function showResults(colorDescriptions) {
   results.innerHTML = "";
-
-  const img = document.createElement("img");
-  img.className = "product-preview";
-  img.src = previewUrl;
-  img.alt = "Product image being analyzed";
-  results.appendChild(img);
 
   const descSection = document.createElement("div");
   descSection.className = "color-descriptions";

@@ -15,47 +15,27 @@
   injectSidebar();
 
   function injectSidebar() {
-    // Root container that holds overlay + iframe
-    const root = document.createElement("div");
+    // Popup iframe — isolated from the host page styles/scripts
+    const root = document.createElement("iframe");
+    root.src = chrome.runtime.getURL("sidebar.html");
     root.id = "accessible-colors-root";
     root.style.cssText = `
       all: initial;
       position: fixed;
-      inset: 0;
-      z-index: 2147483647;
-      pointer-events: none;
-    `;
-
-    // Semi-transparent overlay (clicking it closes the sidebar)
-    const overlay = document.createElement("div");
-    overlay.id = "accessible-colors-overlay";
-    overlay.style.cssText = `
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-      pointer-events: all;
-      cursor: pointer;
-    `;
-    overlay.addEventListener("click", () => root.remove());
-
-    // Sidebar iframe — isolated from the host page styles/scripts
-    const iframe = document.createElement("iframe");
-    iframe.src = chrome.runtime.getURL("sidebar.html");
-    iframe.id = "accessible-colors-iframe";
-    iframe.style.cssText = `
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 350px;
-      height: 100%;
+      top: 20px;
+      right: 20px;
+      width: 400px;
+      height: 560px;
       border: none;
-      pointer-events: all;
-      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.25);
+      border-radius: 4px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      z-index: 2147483647;
     `;
 
-    root.appendChild(overlay);
-    root.appendChild(iframe);
     document.body.appendChild(root);
+
+    // iframe is both root and the element we reference below
+    const iframe = root;
 
     // Pass the current page URL to the sidebar once it loads
     iframe.addEventListener("load", () => {

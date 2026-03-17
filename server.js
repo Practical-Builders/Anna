@@ -5,7 +5,6 @@ import { chromium } from "playwright-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
 chromium.use(StealthPlugin());
-import fs from "fs";
 
 const PORT = 3001;
 const TIMEOUT_MS = 30_000;
@@ -197,9 +196,6 @@ async function takeScreenshot(url) {
       );
     }
 
-    fs.writeFileSync("screenshot-debug.png", screenshotBuffer);
-    console.log("[server] Debug screenshot saved to screenshot-debug.png");
-
     return screenshotBuffer;
   } finally {
     await browser.close();
@@ -296,10 +292,7 @@ app.post("/analyze", async (req, res) => {
       });
 
     console.log("[server] Color analysis complete.");
-    res.json({
-      colorDescriptions,
-      screenshot: base64Image,
-    });
+    res.json({ colorDescriptions });
   } catch (err) {
     console.error("[server] Fatal error during analyze:", err.message);
     res.status(502).json({ error: err.message || "Could not analyze the page." });
