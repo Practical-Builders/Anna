@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Accessible Colors",
+  "name": "ColorSeen",
   "version": "1.0.0",
   "description": "Describes product colors for visually impaired and colorblind shoppers.",
   "permissions": ["activeTab", "scripting"],

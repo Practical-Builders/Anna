@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact — ColorSeen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+
+    <!-- Decorative top banner -->
+    <div class="banner-top"></div>
+
+    <!-- Brand banner -->
+    <header class="brand-header">
+      <div class="brand-header-inner">
+        <img src="assets/images/icon120.png" alt="ColorSeen logo" class="brand-logo" />
+        <a href="index.html" class="brand-name">ColorSeen</a>
+      </div>
+      <nav class="nav-links">
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link nav-link--active">Contact</a>
+        <a href="#" class="nav-download-btn">Add to Chrome</a>
+      </nav>
+    </header>
+
+    <!-- Contact form -->
+    <main class="page-main">
+      <div class="page-content">
+        <h1 class="page-heading">Get in touch</h1>
+        <p class="page-subtext">Have a question or feedback? Fill out the form below.</p>
+
+        <form class="contact-form" action="#" method="post">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" />
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="6" placeholder="Your message…"></textarea>
+          </div>
+          <button type="submit" class="cta-btn">Send message</button>
+        </form>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 ColorSeen</p>
+    </footer>
+
+  </body>
+</html>

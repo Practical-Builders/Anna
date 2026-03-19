@@ -3,45 +3,100 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Accessible Colors</title>
+    <title>ColorSeen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles/main.css" />
   </head>
   <body>
-    <header>
-      <h1>Accessible Colors</h1>
-      <p class="tagline">Accessible color descriptions for online shopping</p>
+
+    <!-- 1. Decorative top banner -->
+    <div class="banner-top"></div>
+
+    <!-- 2. Brand banner -->
+    <header class="brand-header">
+      <div class="brand-header-inner">
+        <img src="assets/images/icon120.png" alt="ColorSeen logo" class="brand-logo" />
+        <span class="brand-name">ColorSeen</span>
+      </div>
+      <nav class="nav-links">
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+        <a href="#" class="nav-download-btn">Add to Chrome</a>
+      </nav>
     </header>
 
-    <main>
-      <label for="product-url">Product URL</label>
-      <input
-        type="url"
-        id="product-url"
-        placeholder="https://example.com/product"
-        aria-describedby="url-hint"
-      />
-      <p id="url-hint" class="hint">Paste a product page URL — our backend will screenshot it for analysis.</p>
+    <!-- 3. Hero section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="hero-heading">Shop online with confidence</h1>
+        <p class="hero-subtext">ColorSeen describes product colors clearly and accessibly, so everyone can shop with confidence, regardless of how they see color.</p>
+        <a href="#" class="cta-btn">Get the Chrome extension</a>
+      </div>
+      <div class="hero-images">
+        <img src="assets/images/heroimage1.jpg" alt="ColorSeen extension in action" class="hero-img hero-img--1" />
+        <img src="assets/images/heroImage2.jpg" alt="ColorSeen extension in action" class="hero-img hero-img--2" />
+      </div>
+    </section>
 
-      <div class="divider" aria-hidden="true">or</div>
+    <!-- 4. How it works section -->
+    <section class="how-it-works">
+      <h2 class="section-heading">How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-image">
+            <img src="assets/images/step1.png" alt="Step 1" />
+          </div>
+          <div class="step-number">1</div>
+          <h3>Navigate to a product</h3>
+          <p>Go to any product page on your favorite online store.</p>
+        </div>
+        <div class="step">
+          <div class="step-image">
+            <img src="assets/images/step2.png" alt="Step 2" />
+          </div>
+          <div class="step-number">2</div>
+          <h3>Click the extension</h3>
+          <p>Open ColorSeen from your Chrome toolbar with a single click.</p>
+        </div>
+        <div class="step">
+          <div class="step-image">
+            <img src="assets/images/step3.png" alt="Step 3" />
+          </div>
+          <div class="step-number">3</div>
+          <h3>Read the description</h3>
+          <p>Get a clear, detailed color description — no guessing required.</p>
+        </div>
+      </div>
+    </section>
 
-      <label for="product-image">Upload a product image directly</label>
-      <input
-        type="file"
-        id="product-image"
-        accept=".jpg,.jpeg,.png,.webp"
-        aria-describedby="upload-hint"
-      />
-      <p id="upload-hint" class="hint">Accepts .jpg, .jpeg, .png, .webp</p>
+    <!-- 5. Features section -->
+    <section class="features">
+      <h2 class="section-heading">Why ColorSeen</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"></div>
+          <h3>Instant descriptions</h3>
+          <p>Get plain-language color descriptions on any product page with one click.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"></div>
+          <h3>Built for accessibility</h3>
+          <p>Designed for colorblind and visually impaired shoppers who deserve the same information as everyone else.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"></div>
+          <h3>Works everywhere</h3>
+          <p>Compatible with all major online retailers — beauty, fashion, home goods, and more.</p>
+        </div>
+      </div>
+    </section>
 
-      <button id="analyze-btn" type="button">Analyze Colors</button>
-
-      <div id="results" aria-live="polite" aria-atomic="true"></div>
-    </main>
-
-    <footer>
-      <p>&copy; 2026 Accessible Colors</p>
+    <!-- Footer -->
+    <footer class="site-footer">
+      <p>&copy; 2026 ColorSeen</p>
     </footer>
 
-    <script type="module" src="scripts/app.js"></script>
   </body>
 </html>
